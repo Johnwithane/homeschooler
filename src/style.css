@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hand-drawn aesthetic styles */
+body {
+  @apply bg-paper font-comic;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  .worksheet {
+    page-break-after: always;
+    max-width: 100%;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  @page {
+    size: letter;
+    margin: 0.5in;
+  }
+}
+
+/* Hand-drawn border effect */
+.hand-drawn-border {
+  border: 3px solid #1a1a1a;
+  border-radius: 15px;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+}
+
+/* Wobbly text effect */
+.wobbly {
+  display: inline-block;
+  animation: wobble 3s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
