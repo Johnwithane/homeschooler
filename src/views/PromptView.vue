@@ -1,0 +1,176 @@
+<template>
+  <div class="min-h-screen bg-paper p-4 py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <HandDrawnTitle size="large">
+        {{ subject }} Time! {{ subjectIcon }}
+      </HandDrawnTitle>
+
+      <div class="hand-drawn-border bg-white p-8 space-y-6">
+        <!-- Instructions -->
+        <div class="text-center mb-6">
+          <p class="font-hand text-xl text-ink mb-2">
+            Tell me what kind of worksheet you want!
+          </p>
+          <p class="font-hand text-base text-gray-600">
+            Be creative! The more fun your idea, the better the worksheet!
+          </p>
+        </div>
+
+        <!-- Textarea -->
+        <div>
+          <label class="block font-hand font-bold text-lg mb-2 text-ink">
+            Your Story Idea:
+          </label>
+          <textarea
+            v-model="prompt"
+            :placeholder="placeholderText"
+            :disabled="isGenerating"
+            class="hand-drawn-border w-full h-48 px-4 py-3 font-hand text-lg bg-white focus:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none disabled:opacity-50"
+          ></textarea>
+        </div>
+
+        <!-- Example Prompts -->
+        <div v-if="examplePrompts.length > 0">
+          <p class="font-hand text-sm text-gray-600 mb-2">
+            💡 Need inspiration? Try one of these:
+          </p>
+          <div class="space-y-2">
+            <button
+              v-for="(example, index) in examplePrompts"
+              :key="index"
+              :disabled="isGenerating"
+              class="block w-full text-left hand-drawn-border bg-blue-50 hover:bg-blue-100 px-4 py-2 font-hand text-sm transition-colors disabled:opacity-50"
+              @click="prompt = example"
+            >
+              {{ example }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div v-if="error" class="hand-drawn-border bg-red-100 p-4">
+          <p class="font-hand text-red-700 font-bold">
+            ⚠️ Oops! {{ error }}
+          </p>
+          <p class="font-hand text-sm text-red-600 mt-2">
+            Please try again or use a different prompt.
+          </p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-center gap-4 pt-4">
+          <HandDrawnButton
+            @click="goBack"
+            :disabled="isGenerating"
+            size="medium"
+          >
+            ← Back
+          </HandDrawnButton>
+
+          <HandDrawnButton
+            variant="primary"
+            size="large"
+            :disabled="!canGenerate"
+            @click="generateWorksheet"
+          >
+            <span v-if="!isGenerating">Generate Worksheet! ✨</span>
+            <span v-else>Generating... 🎨</span>
+          </HandDrawnButton>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="isGenerating" class="text-center">
+          <div class="inline-block animate-spin text-4xl">🎨</div>
+          <p class="font-hand text-lg text-ink mt-2">
+            Creating your awesome worksheet...
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import { useWorksheetStore } from '@/stores/worksheetStore'
+import { generateWorksheet as generateWorksheetAPI, getExamplePrompts } from '@/services/llmService'
+import HandDrawnTitle from '@/components/common/HandDrawnTitle.vue'
+import HandDrawnButton from '@/components/common/HandDrawnButton.vue'
+
+const router = useRouter()
+const route = useRoute()
+const userStore = useUserStore()
+const worksheetStore = useWorksheetStore()
+
+// Props
+const subject = route.params.subject
+
+// Local state
+const prompt = ref('')
+const examplePrompts = ref([])
+
+// Computed
+const isGenerating = computed(() => worksheetStore.isGenerating)
+const error = computed(() => worksheetStore.error)
+
+const subjectIcon = computed(() => {
+  const icons = {
+    'Math': '🔢',
+    'Science': '🔬',
+    'Reading': '📚',
+    'Writing': '✍️'
+  }
+  return icons[subject] || '📝'
+})
+
+const placeholderText = computed(() => {
+  const placeholders = {
+    'Math': 'Example: I want to count apples with a friendly dragon in a magical garden...',
+    'Science': 'Example: Explore the life cycle of butterflies in a beautiful garden...',
+    'Reading': 'Example: Read about a brave knight going on a quest to save the kingdom...',
+    'Writing': 'Example: Write about a day in the life of a superhero who can talk to animals...'
+  }
+  return placeholders[subject] || 'Describe your worksheet idea here...'
+})
+
+const canGenerate = computed(() => {
+  return prompt.value.trim().length > 10 && !isGenerating.value
+})
+
+// Methods
+async function generateWorksheet() {
+  if (!canGenerate.value) return
+
+  worksheetStore.setGenerating(true)
+  worksheetStore.setError(null)
+
+  try {
+    const worksheet = await generateWorksheetAPI(
+      userStore.grade,
+      subject,
+      userStore.studentName,
+      prompt.value
+    )
+
+    worksheetStore.setWorksheet(worksheet)
+    router.push('/worksheet')
+  } catch (err) {
+    console.error('Error generating worksheet:', err)
+    worksheetStore.setError(err.message || 'Failed to generate worksheet. Please try again.')
+  } finally {
+    worksheetStore.setGenerating(false)
+  }
+}
+
+function goBack() {
+  router.push('/subjects')
+}
+
+// Lifecycle
+onMounted(() => {
+  examplePrompts.value = getExamplePrompts(subject)
+})
+</script>
