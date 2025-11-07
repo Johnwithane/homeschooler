@@ -254,32 +254,38 @@ Example for "2 + 3 = ?":
   let userMessage = ''
 
   if (isMadLib) {
-    // Extract asset names from the new nested structure
-    const characterName = userPrompt.character.preset || 'character'
-    const objectName = userPrompt.object.preset || 'object'
-    const placeName = userPrompt.place.preset || 'place'
+    // Extract typed names (what user typed) and asset types (for visuals)
+    const characterStoryName = userPrompt.character.name || 'character'
+    const objectStoryName = userPrompt.object.name || 'objects'
+    const placeStoryName = userPrompt.place.name || 'place'
 
-    // Get friendly labels for the assets
-    const characterLabel = getAssetLabel(characterName, 'characters')
-    const objectLabel = getAssetLabel(objectName, 'objects')
-    const placeLabel = getAssetLabel(placeName, 'backgrounds')
+    // Asset presets for visual representation
+    const characterAsset = userPrompt.character.preset || 'character'
+    const objectAsset = userPrompt.object.preset || 'object'
+    const placeAsset = userPrompt.place.preset || 'place'
+
+    // Story notes for additional context
+    const additionalNotes = userPrompt.storyNotes ? `\n- Additional Story Details: ${userPrompt.storyNotes}` : ''
 
     userMessage = `Student: ${studentName}
 
 STORY REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
-- Main Character: A ${characterLabel} (use "${characterName}" asset from characters category)
-- Objects in story: ${objectLabel} (use "${objectName}" asset from objects category)
-- Location: ${placeLabel} (use "${placeName}" asset from backgrounds category)
+- Main Character Name: "${characterStoryName}" (use "${characterAsset}" asset from characters category for visuals)
+- Objects in story: "${objectStoryName}" (use "${objectAsset}" asset from objects category for visuals)
+- Location Name: "${placeStoryName}" (use "${placeAsset}" asset from backgrounds category for visuals)${additionalNotes}
 
-Create a compelling ${config.problemCount}-panel story about a ${characterLabel} going on an adventure in a ${placeLabel}. The story should involve ${objectLabel} and include math problems with them!
+Create a compelling ${config.problemCount}-panel story about ${characterStoryName} going on an adventure in ${placeStoryName}. The story should involve ${objectStoryName} and include math problems with them!
 
 Make sure:
-1. The "${characterName}" appears as the main character in every panel
-2. The story takes place in the "${placeName}" setting
-3. The "${objectName}" are central to the math problems
-4. The story is coherent, engaging, and makes sense
-5. Each panel's assets accurately represent the story beat
-6. Use creative and age-appropriate storytelling that makes math fun!`
+1. Use "${characterStoryName}" as the character's name in the story
+2. The story takes place in "${placeStoryName}"
+3. The "${objectStoryName}" are central to the math problems
+4. Use the "${characterAsset}" visual asset for the main character in every panel
+5. Use the "${objectAsset}" visual asset for the objects in the story
+6. Use the "${placeAsset}" visual asset to represent the location
+7. The story is coherent, engaging, and makes sense
+8. Each panel's assets accurately represent the story beat
+9. Use creative and age-appropriate storytelling that makes math fun!`
   } else {
     // Traditional string prompt
     userMessage = `Student: ${studentName}
