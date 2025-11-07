@@ -64,6 +64,11 @@ export async function generateWorksheet(grade, subject, studentName, userPrompt)
   const config = gradeConfig[grade]
   const subjectInstruction = subjectInstructions[subject][grade]
 
+  // Use panel-based system for Math, traditional for others
+  if (subject === 'Math') {
+    return generateMathPanelWorksheet(grade, config, subjectInstruction, studentName, userPrompt)
+  }
+
   const systemPrompt = `You are a creative and educational worksheet generator for ${grade === 'K' ? 'Kindergarten' : `${grade} grade`} students.
 
 Create a fun, engaging worksheet with:
@@ -156,13 +161,137 @@ Create a ${subject} worksheet for grade ${grade}.`
  * @param {string} subject - Subject area
  * @returns {Array<string>} Example prompts
  */
+/**
+ * Generate a Math worksheet with comic panel-style incremental story
+ * @param {string} grade - Student's grade level
+ * @param {Object} config - Grade configuration
+ * @param {string} subjectInstruction - Subject-specific instruction
+ * @param {string} studentName - Student's name
+ * @param {string} userPrompt - User's creative story prompt
+ * @returns {Promise<Object>} Generated worksheet with panels
+ */
+async function generateMathPanelWorksheet(grade, config, subjectInstruction, studentName, userPrompt) {
+  const systemPrompt = `You are creating a COMIC BOOK STYLE math worksheet for ${grade === 'K' ? 'Kindergarten' : `Grade ${grade}`} students.
+
+IMPORTANT: Create an incremental story that unfolds across ${config.problemCount} comic-style panels, like a storybook!
+
+Grade Level: ${grade === 'K' ? 'Kindergarten' : `Grade ${grade}`}
+Math Focus: ${subjectInstruction}
+Complexity: ${config.complexity}
+
+Available asset categories:
+- characters: dragon, unicorn, robot, pirate, astronaut, cat, dog, bear, wizard
+- objects: apple, cookie, treasure, star, book, flower, coin, ball, gift, pizza, car, rocket
+- backgrounds: garden, space, ocean, house, castle, forest, mountain, school
+- actions: plus, minus, multiply, divide, equals, question, arrow_right, arrow_left
+
+Return ONLY valid JSON (no markdown, no code blocks):
+{
+  "storyTitle": "The Adventure Title",
+  "panels": [
+    {
+      "storyBeat": "Short sentence describing what happens in THIS panel (like a comic caption)",
+      "question": "The math question that fits this story moment",
+      "answer": "The correct answer",
+      "answerType": "line",
+      "assets": [
+        {
+          "category": "characters",
+          "name": "dragon",
+          "x": 20,
+          "y": 50,
+          "size": "4rem",
+          "layer": 2
+        },
+        {
+          "category": "objects",
+          "name": "apple",
+          "x": 60,
+          "y": 40,
+          "size": "2.5rem",
+          "layer": 1
+        }
+      ]
+    }
+  ]
+}
+
+RULES:
+1. Each panel tells ONE story beat that flows from the previous one
+2. Story should progress: beginning → middle → end
+3. Position assets using x/y percentages (0-100)
+4. Use 2-4 assets per panel to illustrate the math problem
+5. answerType: "line" (default), "box", or "multiple_choice"
+6. For multiple_choice, include "options": ["A", "B", "C", "D"]
+7. Keep story beats SHORT (one sentence)
+8. Make the math visual - show it with the assets!
+
+Example for "2 + 3 = ?":
+- Asset 1: 2 apples on left (x: 25)
+- Asset 2: plus sign (x: 50)
+- Asset 3: 3 apples on right (x: 75)`
+
+  const userMessage = `Student: ${studentName}
+Story theme: ${userPrompt}
+
+Create ${config.problemCount} connected story panels with math problems.`
+
+  try {
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage }
+      ],
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.9, // Higher creativity for stories
+      max_tokens: 3072, // More tokens for panel data
+    })
+
+    const content = completion.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('No response from API')
+    }
+
+    let cleanContent = content.trim()
+    if (cleanContent.startsWith('```')) {
+      cleanContent = cleanContent.replace(/```json\n?/g, '').replace(/```\n?/g, '')
+    }
+
+    const worksheet = JSON.parse(cleanContent)
+
+    if (!worksheet.panels || !Array.isArray(worksheet.panels)) {
+      throw new Error('Invalid worksheet structure - missing panels')
+    }
+
+    return {
+      storyTitle: worksheet.storyTitle || 'Math Adventure',
+      panels: worksheet.panels,
+      subject: 'Math',
+      grade,
+      studentName,
+      generatedAt: new Date().toISOString(),
+      isPanelBased: true
+    }
+  } catch (error) {
+    console.error('Error generating panel worksheet:', error)
+
+    if (error.message.includes('network') || error.message.includes('fetch')) {
+      console.log('Retrying due to network error...')
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      return generateMathPanelWorksheet(grade, config, subjectInstruction, studentName, userPrompt)
+    }
+
+    throw error
+  }
+}
+
 export function getExamplePrompts(subject) {
   const examples = {
     'Math': [
-      'I want to count apples with a friendly dragon in a magical garden',
-      'Help me learn addition by collecting treasures with a pirate',
-      'Practice multiplication by baking cookies with a funny chef',
-      'Solve division problems in a space adventure with aliens'
+      'A dragon collecting apples in a magical garden',
+      'A pirate searching for treasure on an island',
+      'An astronaut counting stars in space',
+      'A wizard mixing potions with magical ingredients'
     ],
     'Science': [
       'Explore the life cycle of butterflies in a beautiful garden',

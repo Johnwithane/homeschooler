@@ -1,0 +1,195 @@
+{
+  "characters": {
+    "dragon": {
+      "emoji": "🐉",
+      "image": null,
+      "description": "Friendly dragon"
+    },
+    "unicorn": {
+      "emoji": "🦄",
+      "image": null,
+      "description": "Magical unicorn"
+    },
+    "robot": {
+      "emoji": "🤖",
+      "image": null,
+      "description": "Helpful robot"
+    },
+    "pirate": {
+      "emoji": "🏴‍☠️",
+      "image": null,
+      "description": "Adventurous pirate"
+    },
+    "astronaut": {
+      "emoji": "👨‍🚀",
+      "image": null,
+      "description": "Space explorer"
+    },
+    "cat": {
+      "emoji": "🐱",
+      "image": null,
+      "description": "Curious cat"
+    },
+    "dog": {
+      "emoji": "🐕",
+      "image": null,
+      "description": "Friendly dog"
+    },
+    "bear": {
+      "emoji": "🐻",
+      "image": null,
+      "description": "Cuddly bear"
+    },
+    "wizard": {
+      "emoji": "🧙",
+      "image": null,
+      "description": "Magic wizard"
+    }
+  },
+  "objects": {
+    "apple": {
+      "emoji": "🍎",
+      "image": null,
+      "description": "Red apple"
+    },
+    "cookie": {
+      "emoji": "🍪",
+      "image": null,
+      "description": "Chocolate chip cookie"
+    },
+    "treasure": {
+      "emoji": "💎",
+      "image": null,
+      "description": "Precious treasure"
+    },
+    "star": {
+      "emoji": "⭐",
+      "image": null,
+      "description": "Shiny star"
+    },
+    "book": {
+      "emoji": "📚",
+      "image": null,
+      "description": "Stack of books"
+    },
+    "flower": {
+      "emoji": "🌸",
+      "image": null,
+      "description": "Pretty flower"
+    },
+    "coin": {
+      "emoji": "🪙",
+      "image": null,
+      "description": "Gold coin"
+    },
+    "ball": {
+      "emoji": "⚽",
+      "image": null,
+      "description": "Soccer ball"
+    },
+    "gift": {
+      "emoji": "🎁",
+      "image": null,
+      "description": "Present box"
+    },
+    "pizza": {
+      "emoji": "🍕",
+      "image": null,
+      "description": "Pizza slice"
+    },
+    "car": {
+      "emoji": "🚗",
+      "image": null,
+      "description": "Small car"
+    },
+    "rocket": {
+      "emoji": "🚀",
+      "image": null,
+      "description": "Space rocket"
+    }
+  },
+  "backgrounds": {
+    "garden": {
+      "emoji": "🌳",
+      "image": null,
+      "description": "Garden scene"
+    },
+    "space": {
+      "emoji": "🌌",
+      "image": null,
+      "description": "Outer space"
+    },
+    "ocean": {
+      "emoji": "🌊",
+      "image": null,
+      "description": "Ocean waves"
+    },
+    "house": {
+      "emoji": "🏠",
+      "image": null,
+      "description": "Cozy house"
+    },
+    "castle": {
+      "emoji": "🏰",
+      "image": null,
+      "description": "Medieval castle"
+    },
+    "forest": {
+      "emoji": "🌲",
+      "image": null,
+      "description": "Dense forest"
+    },
+    "mountain": {
+      "emoji": "⛰️",
+      "image": null,
+      "description": "Mountain peak"
+    },
+    "school": {
+      "emoji": "🏫",
+      "image": null,
+      "description": "School building"
+    }
+  },
+  "actions": {
+    "plus": {
+      "emoji": "➕",
+      "image": null,
+      "description": "Addition symbol"
+    },
+    "minus": {
+      "emoji": "➖",
+      "image": null,
+      "description": "Subtraction symbol"
+    },
+    "multiply": {
+      "emoji": "✖️",
+      "image": null,
+      "description": "Multiplication symbol"
+    },
+    "divide": {
+      "emoji": "➗",
+      "image": null,
+      "description": "Division symbol"
+    },
+    "equals": {
+      "emoji": "🟰",
+      "image": null,
+      "description": "Equals symbol"
+    },
+    "question": {
+      "emoji": "❓",
+      "image": null,
+      "description": "Question mark"
+    },
+    "arrow_right": {
+      "emoji": "➡️",
+      "image": null,
+      "description": "Right arrow"
+    },
+    "arrow_left": {
+      "emoji": "⬅️",
+      "image": null,
+      "description": "Left arrow"
+    }
+  }
+}
