@@ -104,7 +104,7 @@ Create a ${subject} worksheet for grade ${grade}.`
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage }
       ],
-      model: 'llama-3.1-70b-versatile', // Fast and capable model
+      model: 'llama-3.1-8b-instant', // Fast and capable model
       temperature: 0.8,
       max_tokens: 2048,
     })
