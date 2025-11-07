@@ -1,6 +1,17 @@
 <template>
   <div class="min-h-screen bg-paper p-4 py-8">
     <div class="max-w-4xl mx-auto">
+      <!-- Back Button - Top Left -->
+      <div class="mb-4">
+        <HandDrawnButton
+          @click="goBack"
+          :disabled="isGenerating"
+          size="small"
+        >
+          ← Back
+        </HandDrawnButton>
+      </div>
+
       <!-- Header -->
       <HandDrawnTitle size="large">
         {{ subject }} Time! {{ subjectIcon }}
@@ -75,16 +86,8 @@
           </p>
         </div>
 
-        <!-- Buttons -->
-        <div class="flex justify-center gap-4 pt-4">
-          <HandDrawnButton
-            @click="goBack"
-            :disabled="isGenerating"
-            size="medium"
-          >
-            ← Back
-          </HandDrawnButton>
-
+        <!-- Generate Button -->
+        <div class="flex justify-center pt-4">
           <HandDrawnButton
             variant="primary"
             size="large"
@@ -131,16 +134,24 @@ const prompt = ref('')
 const examplePrompts = ref([])
 const madLibData = ref({
   mathType: 'addition',
-  characterName: '',
-  sound: '',
-  objectPlural: '',
-  place: '',
-  action: '',
-  adjective: '',
-  storyNotes: '',
-  characterImage: '',
-  customImage: null,
-  customImageName: ''
+  character: {
+    type: null,
+    preset: '',
+    customImage: null,
+    customImageName: ''
+  },
+  object: {
+    type: null,
+    preset: '',
+    customImage: null,
+    customImageName: ''
+  },
+  place: {
+    type: null,
+    preset: '',
+    customImage: null,
+    customImageName: ''
+  }
 })
 
 // Computed
@@ -173,12 +184,12 @@ const canGenerate = computed(() => {
   // For Math, validate Mad Lib form
   if (subject === 'Math') {
     const data = madLibData.value
-    return (
-      data.characterName.trim().length > 0 &&
-      data.objectPlural.trim().length > 0 &&
-      data.place.trim().length > 0 &&
-      (data.characterImage || data.customImage)
-    )
+    // Check if all three assets have been selected
+    const hasCharacter = data.character.type && (data.character.preset || data.character.customImage)
+    const hasObject = data.object.type && (data.object.preset || data.object.customImage)
+    const hasPlace = data.place.type && (data.place.preset || data.place.customImage)
+
+    return hasCharacter && hasObject && hasPlace
   }
 
   // For other subjects, validate prompt

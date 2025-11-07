@@ -1,12 +1,19 @@
 <template>
   <div class="min-h-screen bg-paper p-4 py-8">
     <div class="max-w-6xl mx-auto">
+      <!-- Back Button - Top Left -->
+      <div class="mb-4">
+        <HandDrawnButton @click="goBack" size="small">
+          ← Back
+        </HandDrawnButton>
+      </div>
+
       <!-- Header -->
       <div class="mb-8">
         <HandDrawnTitle size="large">
           Hi {{ userStore.studentName }}! 👋
         </HandDrawnTitle>
-        <p class="text-center font-hand text-xl text-ink">
+        <p class="text-center font-hand text-ink">
           Pick a subject to start learning!
         </p>
       </div>
@@ -22,13 +29,6 @@
           :disabled="subject.name !== 'Math'"
           @click="selectSubject(subject.name)"
         />
-      </div>
-
-      <!-- Back Button -->
-      <div class="flex justify-center">
-        <HandDrawnButton @click="goBack" size="small">
-          ← Back to Setup
-        </HandDrawnButton>
       </div>
     </div>
   </div>
