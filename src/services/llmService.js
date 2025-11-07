@@ -254,27 +254,32 @@ Example for "2 + 3 = ?":
   let userMessage = ''
 
   if (isMadLib) {
-    // Construct detailed message from mad lib data
-    const characterEmoji = userPrompt.characterImage ? getCharacterEmojiForPrompt(userPrompt.characterImage) : '👤'
+    // Extract asset names from the new nested structure
+    const characterName = userPrompt.character.preset || 'character'
+    const objectName = userPrompt.object.preset || 'object'
+    const placeName = userPrompt.place.preset || 'place'
+
+    // Get friendly labels for the assets
+    const characterLabel = getAssetLabel(characterName, 'characters')
+    const objectLabel = getAssetLabel(objectName, 'objects')
+    const placeLabel = getAssetLabel(placeName, 'backgrounds')
+
     userMessage = `Student: ${studentName}
 
 STORY REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
-- Main Character: ${userPrompt.characterName} (use "${userPrompt.characterImage || 'person'}" asset)
-- Objects in story: ${userPrompt.objectPlural}
-- Location: ${userPrompt.place}
-${userPrompt.action ? `- Action: ${userPrompt.action}` : ''}
-${userPrompt.adjective ? `- Adjective to use: ${userPrompt.adjective}` : ''}
-${userPrompt.sound ? `- Include this sound: "${userPrompt.sound}"` : ''}
-${userPrompt.storyNotes ? `- Additional notes: ${userPrompt.storyNotes}` : ''}
+- Main Character: A ${characterLabel} (use "${characterName}" asset from characters category)
+- Objects in story: ${objectLabel} (use "${objectName}" asset from objects category)
+- Location: ${placeLabel} (use "${placeName}" asset from backgrounds category)
 
-Create a compelling ${config.problemCount}-panel story about ${userPrompt.characterName} ${userPrompt.action || 'going on an adventure'} in ${userPrompt.place}. The story should involve ${userPrompt.objectPlural} and be ${userPrompt.adjective || 'exciting'}!
+Create a compelling ${config.problemCount}-panel story about a ${characterLabel} going on an adventure in a ${placeLabel}. The story should involve ${objectLabel} and include math problems with them!
 
 Make sure:
-1. The character "${userPrompt.characterName}" appears in every panel
-2. The story takes place in "${userPrompt.place}"
-3. The "${userPrompt.objectPlural}" are central to the math problems
+1. The "${characterName}" appears as the main character in every panel
+2. The story takes place in the "${placeName}" setting
+3. The "${objectName}" are central to the math problems
 4. The story is coherent, engaging, and makes sense
-5. Each panel's assets accurately represent the story beat`
+5. Each panel's assets accurately represent the story beat
+6. Use creative and age-appropriate storytelling that makes math fun!`
   } else {
     // Traditional string prompt
     userMessage = `Student: ${studentName}
@@ -333,26 +338,54 @@ Create ${config.problemCount} connected story panels with math problems.`
 }
 
 /**
- * Get character emoji for prompt building
- * @param {string} characterValue - Character identifier
- * @returns {string} Emoji representation
+ * Get friendly label for an asset
+ * @param {string} assetValue - Asset identifier
+ * @param {string} category - Asset category (characters, objects, backgrounds)
+ * @returns {string} Friendly label
  */
-function getCharacterEmojiForPrompt(characterValue) {
-  const characterMap = {
-    'dragon': '🐉',
-    'unicorn': '🦄',
-    'robot': '🤖',
-    'pirate': '🏴‍☠️',
-    'astronaut': '🚀',
-    'cat': '🐱',
-    'dog': '🐶',
-    'bear': '🐻',
-    'wizard': '🧙',
-    'dinosaur': '🦕',
-    'bunny': '🐰',
-    'monkey': '🐵'
+function getAssetLabel(assetValue, category) {
+  const assetLabels = {
+    characters: {
+      'dragon': 'dragon',
+      'unicorn': 'unicorn',
+      'robot': 'robot',
+      'pirate': 'pirate',
+      'astronaut': 'astronaut',
+      'cat': 'cat',
+      'dog': 'dog',
+      'bear': 'bear',
+      'wizard': 'wizard',
+      'dinosaur': 'dinosaur',
+      'bunny': 'bunny',
+      'monkey': 'monkey'
+    },
+    objects: {
+      'apple': 'apples',
+      'cookie': 'cookies',
+      'treasure': 'treasure chests',
+      'star': 'stars',
+      'book': 'books',
+      'flower': 'flowers',
+      'coin': 'coins',
+      'ball': 'balls',
+      'gift': 'gifts',
+      'pizza': 'pizza slices',
+      'car': 'cars',
+      'rocket': 'rockets'
+    },
+    backgrounds: {
+      'garden': 'garden',
+      'space': 'outer space',
+      'ocean': 'ocean',
+      'house': 'house',
+      'castle': 'castle',
+      'forest': 'forest',
+      'mountain': 'mountain',
+      'school': 'school'
+    }
   }
-  return characterMap[characterValue] || '👤'
+
+  return assetLabels[category]?.[assetValue] || assetValue
 }
 
 export function getExamplePrompts(subject) {

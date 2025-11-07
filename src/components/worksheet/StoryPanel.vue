@@ -94,10 +94,20 @@ onMounted(async () => {
  */
 const hasCustomImage = (asset) => {
   const madLibData = worksheetStore.madLibData
-  if (!madLibData || !madLibData.customImage) return false
+  if (!madLibData) return false
 
-  // If this asset is a character and matches the selected character, use custom image
-  return asset.category === 'characters' && asset.name === madLibData.characterImage
+  // Check if this asset matches any of the custom images
+  if (asset.category === 'characters' && madLibData.character) {
+    return asset.name === madLibData.character.preset && madLibData.character.customImage
+  }
+  if (asset.category === 'objects' && madLibData.object) {
+    return asset.name === madLibData.object.preset && madLibData.object.customImage
+  }
+  if (asset.category === 'backgrounds' && madLibData.place) {
+    return asset.name === madLibData.place.preset && madLibData.place.customImage
+  }
+
+  return false
 }
 
 /**
@@ -105,9 +115,24 @@ const hasCustomImage = (asset) => {
  */
 const getCustomImageUrl = (asset) => {
   const madLibData = worksheetStore.madLibData
-  if (hasCustomImage(asset)) {
-    return madLibData.customImage
+  if (!madLibData) return null
+
+  if (asset.category === 'characters' && madLibData.character) {
+    if (asset.name === madLibData.character.preset) {
+      return madLibData.character.customImage
+    }
   }
+  if (asset.category === 'objects' && madLibData.object) {
+    if (asset.name === madLibData.object.preset) {
+      return madLibData.object.customImage
+    }
+  }
+  if (asset.category === 'backgrounds' && madLibData.place) {
+    if (asset.name === madLibData.place.preset) {
+      return madLibData.place.customImage
+    }
+  }
+
   return null
 }
 

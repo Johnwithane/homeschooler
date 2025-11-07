@@ -1,6 +1,16 @@
 <template>
   <div class="min-h-screen bg-paper p-4 py-8">
     <div class="max-w-5xl mx-auto">
+      <!-- Back Button (hidden in print) - Top Left -->
+      <div class="no-print mb-4">
+        <HandDrawnButton
+          size="small"
+          @click="goBack"
+        >
+          ← Back
+        </HandDrawnButton>
+      </div>
+
       <!-- Action Buttons (hidden in print) -->
       <div class="no-print flex justify-center gap-4 mb-6">
         <HandDrawnButton
@@ -17,13 +27,6 @@
           @click="makeAnother"
         >
           ✨ Make Another
-        </HandDrawnButton>
-
-        <HandDrawnButton
-          size="medium"
-          @click="goBack"
-        >
-          ← Back to Setup
         </HandDrawnButton>
       </div>
 
