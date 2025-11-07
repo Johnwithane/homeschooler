@@ -1,6 +1,9 @@
 <template>
   <div class="drawing-canvas-container">
-    <div class="hand-drawn-border bg-white p-2">
+    <p class="font-hand text-sm text-gray-600 mb-2">
+      ✏️ Draw your image below:
+    </p>
+    <div class="canvas-wrapper">
       <canvas
         ref="canvas"
         :width="width"
@@ -124,9 +127,25 @@ function saveDrawing() {
 </script>
 
 <style scoped>
+.canvas-wrapper {
+  display: inline-block;
+  border: 3px solid #2563eb;
+  border-radius: 8px;
+  background: #f0f9ff;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .drawing-canvas {
   cursor: crosshair;
   display: block;
   touch-action: none;
+  background: white;
+  border-radius: 4px;
+  border: 2px dashed #93c5fd;
+}
+
+.drawing-canvas:hover {
+  border-color: #60a5fa;
 }
 </style>
