@@ -10,7 +10,16 @@
           class="asset-item absolute transition-all duration-300"
           :style="getAssetStyle(asset)"
         >
-          <span class="asset-emoji" :style="{ fontSize: asset.size || '3rem' }">
+          <!-- Custom Image -->
+          <img
+            v-if="hasCustomImage(asset)"
+            :src="getCustomImageUrl(asset)"
+            :alt="asset.name"
+            class="custom-asset-image"
+            :style="{ width: asset.size || '3rem', height: asset.size || '3rem' }"
+          />
+          <!-- Emoji Fallback -->
+          <span v-else class="asset-emoji" :style="{ fontSize: asset.size || '3rem' }">
             {{ getAssetEmoji(asset) }}
           </span>
         </div>
@@ -53,6 +62,7 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useAssets } from '@/composables/useAssets'
+import { useWorksheetStore } from '@/stores/worksheetStore'
 
 const props = defineProps({
   panelData: {
@@ -73,10 +83,33 @@ const props = defineProps({
 })
 
 const { getEmoji, loadAssets } = useAssets()
+const worksheetStore = useWorksheetStore()
 
 onMounted(async () => {
   await loadAssets()
 })
+
+/**
+ * Check if an asset should use a custom image
+ */
+const hasCustomImage = (asset) => {
+  const madLibData = worksheetStore.madLibData
+  if (!madLibData || !madLibData.customImage) return false
+
+  // If this asset is a character and matches the selected character, use custom image
+  return asset.category === 'characters' && asset.name === madLibData.characterImage
+}
+
+/**
+ * Get custom image URL for an asset
+ */
+const getCustomImageUrl = (asset) => {
+  const madLibData = worksheetStore.madLibData
+  if (hasCustomImage(asset)) {
+    return madLibData.customImage
+  }
+  return null
+}
 
 /**
  * Get emoji for an asset
@@ -116,6 +149,13 @@ const getAssetStyle = (asset) => {
   display: block;
   line-height: 1;
   filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.custom-asset-image {
+  display: block;
+  object-fit: contain;
+  border-radius: 8px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .story-text {

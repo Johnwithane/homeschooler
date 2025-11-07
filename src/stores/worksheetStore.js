@@ -7,6 +7,7 @@ export const useWorksheetStore = defineStore('worksheet', () => {
   const isGenerating = ref(false)
   const error = ref(null)
   const currentSubject = ref('')
+  const madLibData = ref(null)
 
   // Actions
   function setWorksheet(worksheet) {
@@ -27,11 +28,16 @@ export const useWorksheetStore = defineStore('worksheet', () => {
     currentSubject.value = subject
   }
 
+  function setMadLibData(data) {
+    madLibData.value = data
+  }
+
   function reset() {
     currentWorksheet.value = null
     isGenerating.value = false
     error.value = null
     currentSubject.value = ''
+    madLibData.value = null
   }
 
   return {
@@ -39,10 +45,12 @@ export const useWorksheetStore = defineStore('worksheet', () => {
     isGenerating,
     error,
     currentSubject,
+    madLibData,
     setWorksheet,
     setGenerating,
     setError,
     setSubject,
+    setMadLibData,
     reset,
   }
 })

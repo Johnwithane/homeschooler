@@ -7,44 +7,61 @@
       </HandDrawnTitle>
 
       <div class="hand-drawn-border bg-white p-8 space-y-6">
-        <!-- Instructions -->
-        <div class="text-center mb-6">
-          <p class="font-hand text-xl text-ink mb-2">
-            Tell me what kind of worksheet you want!
-          </p>
-          <p class="font-hand text-base text-gray-600">
-            Be creative! The more fun your idea, the better the worksheet!
-          </p>
+        <!-- Math Mad Lib Form -->
+        <div v-if="subject === 'Math'">
+          <div class="text-center mb-6">
+            <p class="font-hand text-xl text-ink mb-2">
+              Let's create a fun math adventure! 🎉
+            </p>
+            <p class="font-hand text-base text-gray-600">
+              Fill in the blanks to create your unique math story!
+            </p>
+          </div>
+
+          <MadLibForm v-model="madLibData" />
         </div>
 
-        <!-- Textarea -->
-        <div>
-          <label class="block font-hand font-bold text-lg mb-2 text-ink">
-            Your Story Idea:
-          </label>
-          <textarea
-            v-model="prompt"
-            :placeholder="placeholderText"
-            :disabled="isGenerating"
-            class="hand-drawn-border w-full h-48 px-4 py-3 font-hand text-lg bg-white focus:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none disabled:opacity-50"
-          ></textarea>
-        </div>
+        <!-- Traditional Prompt (for other subjects) -->
+        <div v-else>
+          <!-- Instructions -->
+          <div class="text-center mb-6">
+            <p class="font-hand text-xl text-ink mb-2">
+              Tell me what kind of worksheet you want!
+            </p>
+            <p class="font-hand text-base text-gray-600">
+              Be creative! The more fun your idea, the better the worksheet!
+            </p>
+          </div>
 
-        <!-- Example Prompts -->
-        <div v-if="examplePrompts.length > 0">
-          <p class="font-hand text-sm text-gray-600 mb-2">
-            💡 Need inspiration? Try one of these:
-          </p>
-          <div class="space-y-2">
-            <button
-              v-for="(example, index) in examplePrompts"
-              :key="index"
+          <!-- Textarea -->
+          <div>
+            <label class="block font-hand font-bold text-lg mb-2 text-ink">
+              Your Story Idea:
+            </label>
+            <textarea
+              v-model="prompt"
+              :placeholder="placeholderText"
               :disabled="isGenerating"
-              class="block w-full text-left hand-drawn-border bg-blue-50 hover:bg-blue-100 px-4 py-2 font-hand text-sm transition-colors disabled:opacity-50"
-              @click="prompt = example"
-            >
-              {{ example }}
-            </button>
+              class="hand-drawn-border w-full h-48 px-4 py-3 font-hand text-lg bg-white focus:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none disabled:opacity-50"
+            ></textarea>
+          </div>
+
+          <!-- Example Prompts -->
+          <div v-if="examplePrompts.length > 0">
+            <p class="font-hand text-sm text-gray-600 mb-2">
+              💡 Need inspiration? Try one of these:
+            </p>
+            <div class="space-y-2">
+              <button
+                v-for="(example, index) in examplePrompts"
+                :key="index"
+                :disabled="isGenerating"
+                class="block w-full text-left hand-drawn-border bg-blue-50 hover:bg-blue-100 px-4 py-2 font-hand text-sm transition-colors disabled:opacity-50"
+                @click="prompt = example"
+              >
+                {{ example }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -99,6 +116,7 @@ import { useWorksheetStore } from '@/stores/worksheetStore'
 import { generateWorksheet as generateWorksheetAPI, getExamplePrompts } from '@/services/llmService'
 import HandDrawnTitle from '@/components/common/HandDrawnTitle.vue'
 import HandDrawnButton from '@/components/common/HandDrawnButton.vue'
+import MadLibForm from '@/components/math/MadLibForm.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -111,6 +129,19 @@ const subject = route.params.subject
 // Local state
 const prompt = ref('')
 const examplePrompts = ref([])
+const madLibData = ref({
+  mathType: 'addition',
+  characterName: '',
+  sound: '',
+  objectPlural: '',
+  place: '',
+  action: '',
+  adjective: '',
+  storyNotes: '',
+  characterImage: '',
+  customImage: null,
+  customImageName: ''
+})
 
 // Computed
 const isGenerating = computed(() => worksheetStore.isGenerating)
@@ -137,7 +168,21 @@ const placeholderText = computed(() => {
 })
 
 const canGenerate = computed(() => {
-  return prompt.value.trim().length > 10 && !isGenerating.value
+  if (isGenerating.value) return false
+
+  // For Math, validate Mad Lib form
+  if (subject === 'Math') {
+    const data = madLibData.value
+    return (
+      data.characterName.trim().length > 0 &&
+      data.objectPlural.trim().length > 0 &&
+      data.place.trim().length > 0 &&
+      (data.characterImage || data.customImage)
+    )
+  }
+
+  // For other subjects, validate prompt
+  return prompt.value.trim().length > 10
 })
 
 // Methods
@@ -148,11 +193,19 @@ async function generateWorksheet() {
   worksheetStore.setError(null)
 
   try {
+    // For Math, pass mad lib data; for others, pass prompt
+    const worksheetPrompt = subject === 'Math' ? madLibData.value : prompt.value
+
+    // Store mad lib data if it's Math (for custom image display)
+    if (subject === 'Math') {
+      worksheetStore.setMadLibData(madLibData.value)
+    }
+
     const worksheet = await generateWorksheetAPI(
       userStore.grade,
       subject,
       userStore.studentName,
-      prompt.value
+      worksheetPrompt
     )
 
     worksheetStore.setWorksheet(worksheet)
