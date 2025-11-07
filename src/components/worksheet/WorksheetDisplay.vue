@@ -25,60 +25,78 @@
       <h2 class="font-hand font-bold text-3xl text-center text-ink">
         {{ worksheet.subject }} Worksheet
       </h2>
+      <h3 v-if="isPanelBased" class="font-hand text-xl text-center text-ink mt-2">
+        {{ worksheet.storyTitle }}
+      </h3>
     </div>
 
-    <!-- Story Section -->
-    <div class="mb-8">
-      <h3 class="font-hand font-bold text-2xl mb-3 text-ink flex items-center gap-2">
-        <span>📖</span>
-        <span>Story Time!</span>
-      </h3>
-      <div class="hand-drawn-border bg-yellow-50 p-6">
-        <p class="font-hand text-lg leading-relaxed">
-          {{ worksheet.story }}
-        </p>
+    <!-- Panel-Based Layout (for Math) -->
+    <div v-if="isPanelBased">
+      <div class="space-y-8">
+        <StoryPanel
+          v-for="(panel, index) in worksheet.panels"
+          :key="index"
+          :panel-data="panel"
+          :question-number="index + 1"
+        />
       </div>
     </div>
 
-    <!-- Problems Section -->
-    <div>
-      <h3 class="font-hand font-bold text-2xl mb-4 text-ink flex items-center gap-2">
-        <span>✏️</span>
-        <span>Let's Practice!</span>
-      </h3>
-      <div class="space-y-6">
-        <div
-          v-for="(problem, index) in worksheet.problems"
-          :key="index"
-          class="hand-drawn-border bg-blue-50 p-6"
-        >
-          <div class="mb-3">
-            <span class="font-hand font-bold text-xl">{{ index + 1 }}.</span>
-            <span class="font-hand text-lg ml-2">{{ problem.question }}</span>
-          </div>
+    <!-- Traditional Layout (for other subjects) -->
+    <div v-else>
+      <!-- Story Section -->
+      <div class="mb-8">
+        <h3 class="font-hand font-bold text-2xl mb-3 text-ink flex items-center gap-2">
+          <span>📖</span>
+          <span>Story Time!</span>
+        </h3>
+        <div class="hand-drawn-border bg-yellow-50 p-6">
+          <p class="font-hand text-lg leading-relaxed">
+            {{ worksheet.story }}
+          </p>
+        </div>
+      </div>
 
-          <!-- Multiple Choice -->
-          <div v-if="problem.type === 'multiple_choice'" class="ml-6 space-y-2">
-            <div v-for="(option, optIndex) in problem.options" :key="optIndex" class="flex items-center gap-3">
-              <div class="hand-drawn-border w-6 h-6 bg-white"></div>
-              <span class="font-hand text-base">{{ option }}</span>
+      <!-- Problems Section -->
+      <div>
+        <h3 class="font-hand font-bold text-2xl mb-4 text-ink flex items-center gap-2">
+          <span>✏️</span>
+          <span>Let's Practice!</span>
+        </h3>
+        <div class="space-y-6">
+          <div
+            v-for="(problem, index) in worksheet.problems"
+            :key="index"
+            class="hand-drawn-border bg-blue-50 p-6"
+          >
+            <div class="mb-3">
+              <span class="font-hand font-bold text-xl">{{ index + 1 }}.</span>
+              <span class="font-hand text-lg ml-2">{{ problem.question }}</span>
             </div>
-          </div>
 
-          <!-- Fill in the Blank or Short Answer -->
-          <div v-else-if="problem.type === 'fill_blank' || problem.type === 'short_answer'" class="ml-6">
-            <div class="border-b-4 border-dotted border-ink w-full h-12"></div>
-          </div>
-
-          <!-- True/False -->
-          <div v-else-if="problem.type === 'true_false'" class="ml-6 flex gap-6">
-            <div class="flex items-center gap-3">
-              <div class="hand-drawn-border w-6 h-6 bg-white"></div>
-              <span class="font-hand text-base font-bold">True</span>
+            <!-- Multiple Choice -->
+            <div v-if="problem.type === 'multiple_choice'" class="ml-6 space-y-2">
+              <div v-for="(option, optIndex) in problem.options" :key="optIndex" class="flex items-center gap-3">
+                <div class="hand-drawn-border w-6 h-6 bg-white"></div>
+                <span class="font-hand text-base">{{ option }}</span>
+              </div>
             </div>
-            <div class="flex items-center gap-3">
-              <div class="hand-drawn-border w-6 h-6 bg-white"></div>
-              <span class="font-hand text-base font-bold">False</span>
+
+            <!-- Fill in the Blank or Short Answer -->
+            <div v-else-if="problem.type === 'fill_blank' || problem.type === 'short_answer'" class="ml-6">
+              <div class="border-b-4 border-dotted border-ink w-full h-12"></div>
+            </div>
+
+            <!-- True/False -->
+            <div v-else-if="problem.type === 'true_false'" class="ml-6 flex gap-6">
+              <div class="flex items-center gap-3">
+                <div class="hand-drawn-border w-6 h-6 bg-white"></div>
+                <span class="font-hand text-base font-bold">True</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="hand-drawn-border w-6 h-6 bg-white"></div>
+                <span class="font-hand text-base font-bold">False</span>
+              </div>
             </div>
           </div>
         </div>
@@ -96,12 +114,17 @@
 
 <script setup>
 import { computed } from 'vue'
+import StoryPanel from './StoryPanel.vue'
 
 const props = defineProps({
   worksheet: {
     type: Object,
     required: true
   }
+})
+
+const isPanelBased = computed(() => {
+  return props.worksheet.isPanelBased === true
 })
 
 const formattedDate = computed(() => {
