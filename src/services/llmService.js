@@ -62,7 +62,16 @@ const subjectInstructions = {
  */
 export async function generateWorksheet(grade, subject, studentName, userPrompt) {
   const config = gradeConfig[grade]
-  const subjectInstruction = subjectInstructions[subject][grade]
+  const subjectInstruction = subjectInstructions[subject]?.[grade]
+
+  // Validate config exists
+  if (!config) {
+    throw new Error(`Invalid grade level: ${grade}. Please select a valid grade (K-5).`)
+  }
+
+  if (!subjectInstruction) {
+    throw new Error(`No instructions found for ${subject} grade ${grade}.`)
+  }
 
   // Use panel-based system for Math, traditional for others
   if (subject === 'Math') {
