@@ -28,6 +28,9 @@
         <label class="block font-hand font-bold text-sm mb-2 text-ink">
           {{ label }} Image:
         </label>
+        <p class="font-hand text-xs text-gray-500 mb-2">
+          💡 Tip: Pick a base option first, then upload or draw to customize it!
+        </p>
 
         <!-- Tab Buttons -->
         <div class="flex gap-2 mb-3">
@@ -258,7 +261,10 @@ function handleFileUpload(event) {
     localValue.type = 'upload'
     localValue.customImage = e.target?.result
     localValue.customImageName = file.name
-    localValue.preset = ''
+    // Keep preset value if already set, otherwise use first option as default
+    if (!localValue.preset && props.options.length > 0) {
+      localValue.preset = props.options[0].value
+    }
   }
   reader.readAsDataURL(file)
 }
@@ -276,7 +282,10 @@ function handleDrawingSave(dataUrl) {
   localValue.type = 'draw'
   localValue.customImage = dataUrl
   localValue.customImageName = 'drawing'
-  localValue.preset = ''
+  // Keep preset value if already set, otherwise use first option as default
+  if (!localValue.preset && props.options.length > 0) {
+    localValue.preset = props.options[0].value
+  }
 }
 
 function clearDrawing() {
