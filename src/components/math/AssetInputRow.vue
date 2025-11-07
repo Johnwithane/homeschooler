@@ -11,6 +11,24 @@
 
       <!-- Options -->
       <div class="flex-1">
+        <!-- Name Input -->
+        <div class="mb-4">
+          <label class="block font-hand font-bold text-sm mb-1 text-ink">
+            {{ label }} Name:
+          </label>
+          <input
+            v-model="localValue.name"
+            type="text"
+            :placeholder="placeholder"
+            class="hand-drawn-border w-full px-3 py-2 font-hand text-base bg-white focus:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          />
+        </div>
+
+        <!-- Visual Selection Label -->
+        <label class="block font-hand font-bold text-sm mb-2 text-ink">
+          {{ label }} Image:
+        </label>
+
         <!-- Tab Buttons -->
         <div class="flex gap-2 mb-3">
           <button
@@ -150,6 +168,10 @@ const props = defineProps({
     type: String,
     default: '📝'
   },
+  placeholder: {
+    type: String,
+    default: ''
+  },
   options: {
     type: Array,
     required: true
@@ -161,6 +183,7 @@ const props = defineProps({
   modelValue: {
     type: Object,
     default: () => ({
+      name: '',
       type: null,
       preset: '',
       customImage: null,
@@ -175,6 +198,7 @@ const activeTab = ref('preset')
 const fileInput = ref(null)
 
 const localValue = reactive({
+  name: props.modelValue.name || '',
   type: props.modelValue.type || null,
   preset: props.modelValue.preset || '',
   customImage: props.modelValue.customImage || null,

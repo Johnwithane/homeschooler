@@ -23,6 +23,7 @@
       <AssetInputRow
         label="Character"
         emoji="👤"
+        placeholder="e.g., Luna the Dragon, Captain Bob, Super Monkey"
         :options="characterOptions"
         :asset-type="'characters'"
         v-model="formData.character"
@@ -32,6 +33,7 @@
       <AssetInputRow
         label="Object"
         emoji="🎁"
+        placeholder="e.g., magical cookies, shiny gems, rainbow stars"
         :options="objectOptions"
         :asset-type="'objects'"
         v-model="formData.object"
@@ -41,10 +43,23 @@
       <AssetInputRow
         label="Place"
         emoji="🌍"
+        placeholder="e.g., enchanted forest, underwater castle, Moon City"
         :options="placeOptions"
         :asset-type="'backgrounds'"
         v-model="formData.place"
       />
+    </div>
+
+    <!-- Story Notes -->
+    <div class="mt-6">
+      <label class="block font-hand font-bold text-lg mb-2 text-ink">
+        Extra Story Details (Optional) 📝
+      </label>
+      <textarea
+        v-model="formData.storyNotes"
+        placeholder="Add any extra details about your story... What makes it special? What happens? Any special sounds or actions?"
+        class="hand-drawn-border w-full h-24 px-4 py-3 font-hand text-base bg-white focus:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
+      ></textarea>
     </div>
   </div>
 </template>
@@ -106,23 +121,27 @@ const placeOptions = [
 const formData = reactive({
   mathType: 'addition',
   character: {
+    name: '',
     type: null, // 'preset', 'upload', or 'draw'
     preset: '',
     customImage: null,
     customImageName: ''
   },
   object: {
+    name: '',
     type: null,
     preset: '',
     customImage: null,
     customImageName: ''
   },
   place: {
+    name: '',
     type: null,
     preset: '',
     customImage: null,
     customImageName: ''
-  }
+  },
+  storyNotes: ''
 })
 
 // Watch for changes and emit

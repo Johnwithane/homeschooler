@@ -135,23 +135,27 @@ const examplePrompts = ref([])
 const madLibData = ref({
   mathType: 'addition',
   character: {
+    name: '',
     type: null,
     preset: '',
     customImage: null,
     customImageName: ''
   },
   object: {
+    name: '',
     type: null,
     preset: '',
     customImage: null,
     customImageName: ''
   },
   place: {
+    name: '',
     type: null,
     preset: '',
     customImage: null,
     customImageName: ''
-  }
+  },
+  storyNotes: ''
 })
 
 // Computed
@@ -184,10 +188,16 @@ const canGenerate = computed(() => {
   // For Math, validate Mad Lib form
   if (subject === 'Math') {
     const data = madLibData.value
-    // Check if all three assets have been selected
-    const hasCharacter = data.character.type && (data.character.preset || data.character.customImage)
-    const hasObject = data.object.type && (data.object.preset || data.object.customImage)
-    const hasPlace = data.place.type && (data.place.preset || data.place.customImage)
+    // Check if all three elements have both name and visual
+    const hasCharacter = data.character.name.trim().length > 0 &&
+                        data.character.type &&
+                        (data.character.preset || data.character.customImage)
+    const hasObject = data.object.name.trim().length > 0 &&
+                     data.object.type &&
+                     (data.object.preset || data.object.customImage)
+    const hasPlace = data.place.name.trim().length > 0 &&
+                    data.place.type &&
+                    (data.place.preset || data.place.customImage)
 
     return hasCharacter && hasObject && hasPlace
   }
