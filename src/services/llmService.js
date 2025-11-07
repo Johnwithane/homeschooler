@@ -171,16 +171,35 @@ Create a ${subject} worksheet for grade ${grade}.`
  * @returns {Promise<Object>} Generated worksheet with panels
  */
 async function generateMathPanelWorksheet(grade, config, subjectInstruction, studentName, userPrompt) {
+  // Check if userPrompt is a mad lib object or a string
+  const isMadLib = typeof userPrompt === 'object' && userPrompt.mathType
+
+  // Build math type instruction
+  let mathTypeInstruction = ''
+  let mathTypeEmoji = ''
+  if (isMadLib) {
+    const mathTypes = {
+      'addition': { text: 'addition only', emoji: '➕' },
+      'subtraction': { text: 'subtraction only', emoji: '➖' },
+      'multiplication': { text: 'multiplication only', emoji: '✖️' },
+      'division': { text: 'division only', emoji: '➗' },
+      'random': { text: 'a mix of different operations (addition, subtraction, multiplication, division)', emoji: '🎲' }
+    }
+    const mathType = mathTypes[userPrompt.mathType] || mathTypes['random']
+    mathTypeInstruction = `\nMATH TYPE: Create ${mathType.text} problems. ALL problems must be ${mathType.text}.`
+    mathTypeEmoji = mathType.emoji
+  }
+
   const systemPrompt = `You are creating a COMIC BOOK STYLE math worksheet for ${grade === 'K' ? 'Kindergarten' : `Grade ${grade}`} students.
 
 IMPORTANT: Create an incremental story that unfolds across ${config.problemCount} comic-style panels, like a storybook!
 
 Grade Level: ${grade === 'K' ? 'Kindergarten' : `Grade ${grade}`}
 Math Focus: ${subjectInstruction}
-Complexity: ${config.complexity}
+Complexity: ${config.complexity}${mathTypeInstruction}
 
 Available asset categories:
-- characters: dragon, unicorn, robot, pirate, astronaut, cat, dog, bear, wizard
+- characters: dragon, unicorn, robot, pirate, astronaut, cat, dog, bear, wizard, dinosaur, bunny, monkey
 - objects: apple, cookie, treasure, star, book, flower, coin, ball, gift, pizza, car, rocket
 - backgrounds: garden, space, ocean, house, castle, forest, mountain, school
 - actions: plus, minus, multiply, divide, equals, question, arrow_right, arrow_left
@@ -225,16 +244,44 @@ RULES:
 6. For multiple_choice, include "options": ["A", "B", "C", "D"]
 7. Keep story beats SHORT (one sentence)
 8. Make the math visual - show it with the assets!
+9. CRITICAL: Make sure the story and assets accurately reflect the story details provided
 
 Example for "2 + 3 = ?":
 - Asset 1: 2 apples on left (x: 25)
 - Asset 2: plus sign (x: 50)
 - Asset 3: 3 apples on right (x: 75)`
 
-  const userMessage = `Student: ${studentName}
+  let userMessage = ''
+
+  if (isMadLib) {
+    // Construct detailed message from mad lib data
+    const characterEmoji = userPrompt.characterImage ? getCharacterEmojiForPrompt(userPrompt.characterImage) : '👤'
+    userMessage = `Student: ${studentName}
+
+STORY REQUIREMENTS (MUST BE FOLLOWED EXACTLY):
+- Main Character: ${userPrompt.characterName} (use "${userPrompt.characterImage || 'person'}" asset)
+- Objects in story: ${userPrompt.objectPlural}
+- Location: ${userPrompt.place}
+${userPrompt.action ? `- Action: ${userPrompt.action}` : ''}
+${userPrompt.adjective ? `- Adjective to use: ${userPrompt.adjective}` : ''}
+${userPrompt.sound ? `- Include this sound: "${userPrompt.sound}"` : ''}
+${userPrompt.storyNotes ? `- Additional notes: ${userPrompt.storyNotes}` : ''}
+
+Create a compelling ${config.problemCount}-panel story about ${userPrompt.characterName} ${userPrompt.action || 'going on an adventure'} in ${userPrompt.place}. The story should involve ${userPrompt.objectPlural} and be ${userPrompt.adjective || 'exciting'}!
+
+Make sure:
+1. The character "${userPrompt.characterName}" appears in every panel
+2. The story takes place in "${userPrompt.place}"
+3. The "${userPrompt.objectPlural}" are central to the math problems
+4. The story is coherent, engaging, and makes sense
+5. Each panel's assets accurately represent the story beat`
+  } else {
+    // Traditional string prompt
+    userMessage = `Student: ${studentName}
 Story theme: ${userPrompt}
 
 Create ${config.problemCount} connected story panels with math problems.`
+  }
 
   try {
     const completion = await groq.chat.completions.create({
@@ -283,6 +330,29 @@ Create ${config.problemCount} connected story panels with math problems.`
 
     throw error
   }
+}
+
+/**
+ * Get character emoji for prompt building
+ * @param {string} characterValue - Character identifier
+ * @returns {string} Emoji representation
+ */
+function getCharacterEmojiForPrompt(characterValue) {
+  const characterMap = {
+    'dragon': '🐉',
+    'unicorn': '🦄',
+    'robot': '🤖',
+    'pirate': '🏴‍☠️',
+    'astronaut': '🚀',
+    'cat': '🐱',
+    'dog': '🐶',
+    'bear': '🐻',
+    'wizard': '🧙',
+    'dinosaur': '🦕',
+    'bunny': '🐰',
+    'monkey': '🐵'
+  }
+  return characterMap[characterValue] || '👤'
 }
 
 export function getExamplePrompts(subject) {

@@ -3,18 +3,20 @@
     :class="[
       'hand-drawn-border',
       'p-8 w-full',
-      'bg-white hover:bg-gradient-to-br',
-      colorClass,
       'transition-all duration-300',
-      'transform hover:scale-105 active:scale-95',
       'flex flex-col items-center justify-center gap-4',
-      'cursor-pointer'
+      disabled ? 'bg-gray-100 opacity-60 cursor-not-allowed' : 'bg-white hover:bg-gradient-to-br cursor-pointer transform hover:scale-105 active:scale-95',
+      !disabled && colorClass
     ]"
-    @click="$emit('click')"
+    :disabled="disabled"
+    @click="!disabled && $emit('click')"
   >
     <div class="text-6xl">{{ icon }}</div>
     <h3 class="font-hand font-bold text-3xl text-ink">{{ subject }}</h3>
     <p class="font-hand text-sm text-gray-600">{{ description }}</p>
+    <div v-if="disabled" class="mt-2 hand-drawn-border bg-yellow-100 px-4 py-2">
+      <p class="font-hand text-sm font-bold text-yellow-800">Coming Soon! 🚧</p>
+    </div>
   </button>
 </template>
 
@@ -33,6 +35,10 @@ const props = defineProps({
   description: {
     type: String,
     default: ''
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 

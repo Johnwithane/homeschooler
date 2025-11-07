@@ -44,6 +44,21 @@
       "emoji": "🧙",
       "image": null,
       "description": "Magic wizard"
+    },
+    "dinosaur": {
+      "emoji": "🦕",
+      "image": null,
+      "description": "Friendly dinosaur"
+    },
+    "bunny": {
+      "emoji": "🐰",
+      "image": null,
+      "description": "Cute bunny"
+    },
+    "monkey": {
+      "emoji": "🐵",
+      "image": null,
+      "description": "Playful monkey"
     }
   },
   "objects": {

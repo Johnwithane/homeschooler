@@ -19,6 +19,7 @@
           :subject="subject.name"
           :icon="subject.icon"
           :description="subject.description"
+          :disabled="subject.name !== 'Math'"
           @click="selectSubject(subject.name)"
         />
       </div>
